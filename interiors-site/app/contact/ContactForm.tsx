@@ -9,34 +9,40 @@ export default function ContactForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("sending");
+    setMessage("");
 
-    const data = new FormData(e.currentTarget);
+    const formData = new FormData(e.currentTarget);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        body: data,
+        body: formData,
       });
-      const json = await res.json();
-      if (res.ok) {
-        setStatus("success");
-        setMessage(json.message || "Thank you for your enquiry! We'll be in touch soon.");
-        e.currentTarget.reset();
-      } else {
+
+      if (!res.ok) {
+        const errorData = await res.json();
         setStatus("error");
-        setMessage(json.error || "Something went wrong. Please try again later.");
+        setMessage(errorData.error || `Server error: ${res.status}`);
+        return;
       }
+
+      const json = await res.json();
+      setStatus("success");
+      setMessage(json.message || "Thank you for your enquiry! We'll be in touch soon.");
+      e.currentTarget.reset();
     } catch (err) {
-      console.error(err);
+      console.error("Fetch error:", err);
       setStatus("error");
-      setMessage("Network error. Please try again later.");
+      setMessage("Network error. Please check your connection and try again.");
     }
   };
 
   if (status === "success") {
     return (
-      <div className="prose">
-        <h3>Thank you for your enquiry!</h3>
-        <p>We have received your message and will get back to you shortly.</p>
+      <div className="mt-6 space-y-4">
+        <div className="rounded-xl border border-[var(--line)] bg-green-50 p-4">
+          <h3 className="text-lg font-semibold text-green-900">Thank you for your enquiry!</h3>
+          <p className="mt-2 text-green-800">We have received your message and will get back to you shortly.</p>
+        </div>
       </div>
     );
   }
