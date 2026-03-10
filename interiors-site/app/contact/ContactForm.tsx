@@ -18,14 +18,24 @@ export default function ContactForm() {
         body: formData,
       });
 
+      console.log("Response status:", res.status);
+      console.log("Response headers:", res.headers);
+
+      let json;
+      try {
+        json = await res.json();
+        console.log("Response JSON:", json);
+      } catch (parseErr) {
+        console.error("Failed to parse JSON:", parseErr);
+        json = { message: "Response received but could not parse" };
+      }
+
       if (!res.ok) {
-        const errorData = await res.json();
         setStatus("error");
-        setMessage(errorData.error || `Server error: ${res.status}`);
+        setMessage(json.error || `Server error: ${res.status}`);
         return;
       }
 
-      const json = await res.json();
       setStatus("success");
       setMessage(json.message || "Thank you for your enquiry! We'll be in touch soon.");
       e.currentTarget.reset();
