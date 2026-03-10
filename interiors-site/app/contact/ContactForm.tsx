@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [message, setMessage] = useState<string>("");
 
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!mountedRef.current) return;
     setStatus("sending");
     setMessage("");
 
@@ -19,39 +27,45 @@ export default function ContactForm() {
       });
 
       console.log("Response status:", res.status);
-      console.log("Response headers:", res.headers);
-
-      let json;
-      try {
-        json = await res.json();
-        console.log("Response JSON:", json);
-      } catch (parseErr) {
-        console.error("Failed to parse JSON:", parseErr);
-        json = { message: "Response received but could not parse" };
-      }
+      console.log("Response ok:", res.ok);
 
       if (!res.ok) {
-        setStatus("error");
-        setMessage(json.error || `Server error: ${res.status}`);
+        const errorText = await res.text();
+        console.log("Error response:", errorText);
+        if (mountedRef.current) {
+          setStatus("error");
+          setMessage(`Server error: ${res.status}`);
+        }
         return;
       }
 
-      setStatus("success");
-      setMessage(json.message || "Thank you for your enquiry! We'll be in touch soon.");
-      e.currentTarget.reset();
+      const json = await res.json();
+      console.log("Success response:", json);
+      if (mountedRef.current) {
+        setStatus("success");
+        setMessage(json.message || "Thank you for your enquiry! We'll be in touch soon.");
+      }
     } catch (err) {
       console.error("Fetch error:", err);
-      setStatus("error");
-      setMessage("Network error. Please check your connection and try again.");
+      if (mountedRef.current) {
+        setStatus("error");
+        setMessage("Network error. Please check your connection and try again.");
+      }
     }
   };
 
   if (status === "success") {
     return (
       <div className="mt-6 space-y-4">
-        <div className="rounded-xl border border-[var(--line)] bg-green-50 p-4">
+        <div className="rounded-xl border border-green-200 bg-green-50 p-6">
           <h3 className="text-lg font-semibold text-green-900">Thank you for your enquiry!</h3>
           <p className="mt-2 text-green-800">We have received your message and will get back to you shortly.</p>
+          <button
+            onClick={() => setStatus("idle")}
+            className="mt-4 text-sm text-green-700 underline hover:text-green-900"
+          >
+            Send another enquiry
+          </button>
         </div>
       </div>
     );
