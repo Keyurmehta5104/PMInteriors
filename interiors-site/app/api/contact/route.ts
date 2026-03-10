@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
     const details = formData.get('details') as string;
 
     if (!name || !email || !details) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'All fields are required' },
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     // Create transporter
@@ -37,10 +40,19 @@ export async function POST(request: NextRequest) {
 
     // Send email
     await transporter.sendMail(mailOptions);
+    
+    // Explicitly close the transporter
+    await transporter.close();
 
-    return NextResponse.json({ message: 'Email sent successfully' });
+    return NextResponse.json(
+      { message: 'Email sent successfully' },
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
   } catch (error) {
     console.error('Error sending email:', error);
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to send email' },
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }
