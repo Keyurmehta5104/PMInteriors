@@ -51,45 +51,7 @@ export default function ContactPage() {
 
       <section className="section-card">
         <h2 className="text-3xl">Project Brief</h2>
-        <form className="mt-6 grid gap-4 md:grid-cols-2" method="post" action="/api/contact" suppressHydrationWarning>
-          <label className="text-sm text-[var(--muted)]">
-            Name
-            <input
-              type="text"
-              name="name"
-              suppressHydrationWarning
-              autoComplete="name"
-              className="focus-ring mt-2 w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[var(--text)]"
-              placeholder="Your full name"
-              required
-            />
-          </label>
-          <label className="text-sm text-[var(--muted)]">
-            Email
-            <input
-              type="email"
-              name="email"
-              suppressHydrationWarning
-              autoComplete="email"
-              className="focus-ring mt-2 w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[var(--text)]"
-              placeholder="you@example.com"
-              required
-            />
-          </label>
-          <label className="text-sm text-[var(--muted)] md:col-span-2">
-            Project details
-            <textarea
-              rows={6}
-              name="details"
-              suppressHydrationWarning
-              autoComplete="off"
-              className="focus-ring mt-2 w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[var(--text)]"
-              placeholder="Property type, area, budget range, timeline"
-              required
-            />
-          </label>
-          <button type="submit" suppressHydrationWarning className="cta cta-primary focus-ring w-fit">Send Brief</button>
-        </form>
+        <ContactForm />
       </section>
     </div>
   );
