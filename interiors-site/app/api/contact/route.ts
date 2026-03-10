@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'pinal.mehta4399@gmail.com',
+      cc: 'keyurmehta5104@gmail.com',
       subject: 'New Inquiry from PM Interiors Website',
       html: `
         <h2>New Project Inquiry</h2>
